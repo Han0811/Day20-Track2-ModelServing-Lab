@@ -4,8 +4,8 @@
 
 ---
 
-**Họ Tên:** _[Điền tên của bạn]_
-**Cohort:** _[Điền Cohort của bạn]_
+**Họ Tên:** Hà Hữu An
+**Cohort:** 
 **Ngày submit:** _2026-05-06_
 
 ---
