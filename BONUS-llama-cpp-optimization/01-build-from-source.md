@@ -77,9 +77,16 @@ Vulkan is slower than vendor-native (CUDA / Metal / ROCm) but works on basically
 
 ## 3. Verify the build
 
+**Linux / macOS:**
 ```bash
 ./build/bin/llama-cli --version
 ./build/bin/llama-bench -m ../../models/<your-model>.gguf -t 0 -ngl 0
+```
+
+**Windows (PowerShell):**
+```powershell
+.\build\bin\Release\llama-cli.exe --version
+.\build\bin\Release\llama-bench.exe -m ..\..\models\<your-model>.gguf -t 0 -ngl 0
 ```
 
 `llama-bench` is the tool the sweep scripts in `benchmarks/` wrap — it's what you should run by hand the first time to make sure things work before kicking off automated sweeps.
@@ -102,10 +109,18 @@ A common newbie mistake is comparing a Debug-built binary to a Release-built one
 
 Update `models/active.json` is unchanged — it points at the GGUF file paths, which are independent of which binary serves them. Then:
 
+**Linux / macOS:**
 ```bash
 # from repo root
 ./BONUS-llama-cpp-optimization/llama.cpp/build/bin/llama-bench \
     -m models/<your-model>.gguf -t 0 -ngl 99
+```
+
+**Windows (PowerShell):**
+```powershell
+# from repo root
+.\BONUS-llama-cpp-optimization\llama.cpp\build\bin\Release\llama-bench.exe `
+    -m models\<your-model>.gguf -t 0 -ngl 99
 ```
 
 Note your tokens/sec — that's the **before** number. The sweep scripts in `benchmarks/` produce **after** numbers.

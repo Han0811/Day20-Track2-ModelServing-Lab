@@ -17,6 +17,7 @@ There are two ways to launch `llama-server`:
 
 ### A. From the `llama-cpp-python` install (always works)
 
+**macOS / Linux:**
 ```bash
 # from repo root, .venv activated
 python -m llama_cpp.server --model "$(jq -r .primary_model models/active.json)" \
@@ -25,10 +26,19 @@ python -m llama_cpp.server --model "$(jq -r .primary_model models/active.json)" 
     --n_gpu_layers 99
 ```
 
+**Windows (PowerShell):**
+```powershell
+# or just run: pwsh 02-llama-cpp-server/start-server.ps1
+$model = python -c 'import json; print(json.load(open("models/active.json"))["primary_model"])'
+$threads = python -c 'import json; print(json.load(open("hardware.json"))["cpu"]["cores_physical"] or 4)'
+python -m llama_cpp.server --model $model --host 0.0.0.0 --port 8080 --n_threads $threads --n_gpu_layers 99
+```
+
 ### B. From a native llama.cpp build (faster, used by the bonus track)
 
 If you've already done `BONUS-llama-cpp-optimization/` and have a `bin/llama-server` from source:
 
+**macOS / Linux:**
 ```bash
 ./BONUS-llama-cpp-optimization/llama.cpp/build/bin/llama-server \
     -m "$(jq -r .primary_model models/active.json)" \
@@ -39,8 +49,18 @@ If you've already done `BONUS-llama-cpp-optimization/` and have a `bin/llama-ser
     --metrics
 ```
 
+**Windows (PowerShell):**
+```powershell
+$model = python -c 'import json; print(json.load(open("models/active.json"))["primary_model"])'
+$threads = python -c 'import json; print(json.load(open("hardware.json"))["cpu"]["cores_physical"] or 4)'
+.\BONUS-llama-cpp-optimization\llama.cpp\build\bin\Release\llama-server.exe `
+    -m $model --host 0.0.0.0 --port 8080 -t $threads -ngl 99 `
+    --parallel 4 --cont-batching --metrics
+```
+
 Either way, leave it running in one terminal. In a second terminal:
 
+**macOS / Linux:**
 ```bash
 # Smoke-test the OpenAI API
 python 02-llama-cpp-server/smoke-test.py
@@ -50,6 +70,19 @@ curl -s http://localhost:8080/metrics | head -40
 
 # Run the load test
 locust -f 02-llama-cpp-server/load-test.py --headless \
+    -u 10 -r 1 -t 1m --host http://localhost:8080
+```
+
+**Windows (PowerShell):**
+```powershell
+# Smoke-test the OpenAI API
+python 02-llama-cpp-server/smoke-test.py
+
+# Scrape metrics once
+Invoke-RestMethod http://localhost:8080/metrics | Select-Object -First 40
+
+# Run the load test
+locust -f 02-llama-cpp-server/load-test.py --headless `
     -u 10 -r 1 -t 1m --host http://localhost:8080
 ```
 

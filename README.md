@@ -14,8 +14,9 @@ Build + tune một inference stack với llama.cpp trên laptop cá nhân của 
 
 ---
 
-## Quick Start
+### Quick Start
 
+**macOS / Linux:**
 ```bash
 git clone https://github.com/<your-username>/Day20-Track2-ModelServing-Lab.git
 cd Day20-Track2-ModelServing-Lab
@@ -30,32 +31,45 @@ make pipeline       # Track 03 — RAG → llama-server pipeline
 make verify         # Sanity-check submission readiness
 ```
 
+**Windows (PowerShell):**
+```powershell
+git clone https://github.com/<your-username>/Day20-Track2-ModelServing-Lab.git
+cd Day20-Track2-ModelServing-Lab
+
+# 1. Setup (Run once)
+pwsh -ExecutionPolicy Bypass -File 00-setup/windows-setup.ps1
+
+# 2. Activate Environment
+.\.venv\Scripts\Activate.ps1
+
+# 3. Run Lab Tracks
+python 01-llama-cpp-quickstart/benchmark.py           # Track 01
+pwsh 02-llama-cpp-server/start-server.ps1             # Track 02 (Run in a separate terminal)
+python 02-llama-cpp-server/smoke-test.py              # Track 02 smoke test
+locust -f 02-llama-cpp-server/load-test.py --headless -u 10 -r 1 -t 1m --host http://localhost:8080
+python 03-milestone-integration/pipeline.py           # Track 03
+python scripts/verify.py                              # Sanity check
+```
+
 **Yêu cầu:** Python ≥ 3.10. Không cần Docker. Không cần OpenAI key.
 
-**Windows:** `make` không native — chạy `pwsh -ExecutionPolicy Bypass -File 00-setup/windows-setup.ps1` rồi gọi từng script Python trực tiếp. Mọi script Python đều chạy trên Windows.
+**Windows Note:** Dự án hỗ trợ đầy đủ Windows qua PowerShell (`pwsh`). Bạn không cần `make`. Hãy sử dụng các script `.ps1` và lệnh `python` trực tiếp như hướng dẫn ở trên.
 
-### Tất cả lệnh `make`
+### Ánh xạ lệnh `make` sang Windows (PowerShell)
 
-```
-make probe          Probe hardware → hardware.json
-make setup          Install deps + build llama-cpp-python + download model
-make bench          Track 01 — TTFT/TPOT baseline + Q4_K_M vs Q2_K
-make serve          Track 02 — llama-server on :8080 (foreground)
-make smoke          Track 02 — smoke-test the running server
-make load-10        Track 02 — locust 10 users, 1 min
-make load-50        Track 02 — locust 50 users, 1 min
-make metrics        Track 02 — record /metrics for 60s
-make pipeline       Track 03 — RAG → llama-server pipeline
-make build-llama    Bonus — clone + build llama.cpp from source
-make sweep-thread   Bonus — sweep -t (thread count)
-make sweep-quant    Bonus — sweep GGUF quantizations
-make sweep-ctx      Bonus — sweep context length
-make sweep-batch    Bonus — sweep batch sizes
-make sweep-gpu      Bonus — sweep GPU offload (CUDA/Metal/Vulkan/ROCm)
-make mlx-compare    Bonus (Apple Silicon) — MLX vs llama.cpp Metal
-make verify         Pre-submission sanity check (run before push!)
-make clean          Wipe generated artifacts (keep models, REFLECTION, screenshots)
-```
+| Lệnh `make` | Lệnh Windows tương đương (sau khi activate `.venv`) |
+|---|---|
+| `make probe` | `python 00-setup/detect-hardware.py` |
+| `make setup` | `pwsh -File 00-setup/windows-setup.ps1` |
+| `make bench` | `python 01-llama-cpp-quickstart/benchmark.py` |
+| `make serve` | `pwsh 02-llama-cpp-server/start-server.ps1` |
+| `make smoke` | `python 02-llama-cpp-server/smoke-test.py` |
+| `make load-10` | `locust -f 02-llama-cpp-server/load-test.py --headless -u 10 -r 1 -t 1m --host http://localhost:8080` |
+| `make load-50` | `locust -f 02-llama-cpp-server/load-test.py --headless -u 50 -r 1 -t 1m --host http://localhost:8080` |
+| `make metrics` | `python 02-llama-cpp-server/record-metrics.py --duration 60` |
+| `make pipeline` | `python 03-milestone-integration/pipeline.py` |
+| `make verify` | `python scripts/verify.py` |
+| `make clean` | `Remove-Item -Recurse -Force .venv, hardware.json, benchmarks/*.csv` |
 
 ---
 
